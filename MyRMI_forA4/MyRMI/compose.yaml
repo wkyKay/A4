@@ -1,0 +1,39 @@
+version: '3'
+
+services:
+  registry:
+    image: 'wkay/registry:v7'
+    container_name: 'myrmi-registry'
+    environment:
+      RUN_COMPONENT: 'REGISTRY'
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z 0.0.0.0 8899 || exit 1"]
+      interval: 1s
+      timeout: 5s
+      retries: 3
+
+  server:
+    image: 'wkay/server:v7'
+    container_name: 'myrmi-server'
+    depends_on:
+      registry:
+        condition: service_healthy
+    environment:
+      RUN_COMPONENT: 'SERVER'
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z 0.0.0.0 3000 || exit 1"]
+      interval: 1s
+      timeout: 5s
+      retries: 3
+
+  client:
+    image: 'wkay/client:v7'
+    container_name: 'myrmi-client'
+    depends_on:
+      registry:
+        condition: service_healthy
+      server:
+        condition: service_healthy
+    environment:
+      RUN_COMPONENT: 'CLIENT'
+
