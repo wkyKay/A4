@@ -8,10 +8,7 @@ WORKDIR /app
 COPY . .
 
 # 构建应用
-RUN apt-get update && apt-get install -y netcat
 RUN mvn clean package
-
-
 
 # 指定启动时的命令，这里假设构建的jar文件名为myrmi-server.jar
 CMD ["java", "-cp", "target/classes", "myrmi.demo.Client"]

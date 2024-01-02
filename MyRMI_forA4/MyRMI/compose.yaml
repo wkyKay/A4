@@ -2,18 +2,18 @@ version: '3'
 
 services:
   registry:
-    image: 'wkay/registry:v7'
+    image: 'wkay/registry:v9'
     container_name: 'myrmi-registry'
     environment:
       RUN_COMPONENT: 'REGISTRY'
     healthcheck:
-      test: ["CMD-SHELL", "nc -z 0.0.0.0 9090 || exit 1"]
+      test: ["CMD-SHELL", "python -c 'import socket; s = socket.socket(socket.AF_INET, socket.SOCK_STREAM); s.connect((\"registry\", 9090))' || exit 1"]
       interval: 1s
       timeout: 5s
       retries: 3
 
   server:
-    image: 'wkay/server:v7'
+    image: 'wkay/server:v9'
     container_name: 'myrmi-server'
     depends_on:
       registry:
@@ -21,13 +21,13 @@ services:
     environment:
       RUN_COMPONENT: 'SERVER'
     healthcheck:
-      test: ["CMD-SHELL", "nc -z 0.0.0.0 8080 || exit 1"]
+      test: ["CMD-SHELL", "python -c 'import socket; s = socket.socket(socket.AF_INET, socket.SOCK_STREAM); s.connect((\"server\", 8080))' || exit 1"]
       interval: 1s
       timeout: 5s
       retries: 3
 
   client:
-    image: 'wkay/client:v7'
+    image: 'wkay/client:v9'
     container_name: 'myrmi-client'
     depends_on:
       registry:
@@ -36,4 +36,3 @@ services:
         condition: service_healthy
     environment:
       RUN_COMPONENT: 'CLIENT'
-
